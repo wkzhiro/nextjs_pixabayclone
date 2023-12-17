@@ -1,5 +1,7 @@
 import GitHubProvider from 'next-auth/providers/github'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import db from '../../../../firebase'
+import { where, collection, getDocs, query } from "firebase/firestore"; 
 
 export const options = {
     providers: [
@@ -22,16 +24,25 @@ export const options = {
                 }
             },
             async authorize(credentials) {
-                // This is where you need to retrieve user data 
-                // to verify with credentials
-                // Docs: https://next-auth.js.org/configuration/providers/credentials
-                const user = { id: "37", name: "Fumi", password: "nextauth" }
+                // Firestoreからユーザーデータを取得
+                const usersRef = collection(db, "registration");
+                const q = query(usersRef, where("name", "==", credentials.username), where("password", "==", credentials.password));
+                const querySnapshot = await getDocs(q);
 
-                if (credentials?.username === user.name && credentials?.password === user.password) {
-                    return user
+                // ユーザーが見つかった場合はそのデータを返す
+                if (!querySnapshot.empty) {
+                    const userDoc = querySnapshot.docs[0];
+                    const user = userDoc.data();
+                    // ユーザーのドキュメントIDをコンソールに出力
+                    console.log("User ID:", userDoc.id);
+                    console.log("User name:", user.name);
+
+                    return { id: userDoc.id, ...user };
                 } else {
-                    return null
+                    return null;
                 }
+
+
             }
         })
     ],

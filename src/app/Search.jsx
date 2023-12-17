@@ -28,16 +28,3 @@ export default function Search({ onSearch, count}) { // Search関数をエクス
     </form>
   );
 }
-// mb-8 w-1/2 mx-auto flex items-center
-//   return (
-//     // form要素を返す、onSubmitにはhandleSubmit関数を指定
-//     <form onSubmit={handleSubmit} className="mb-8 w-1/2 mx-auto"> 
-//       {/* input要素を返す、refにはinputRefを指定 */}
-//       <input ref={inputRef} type="text" name="keyword" placeholder='画像を探す' className="input input-bordered w-full" />
-//       {/* submitボタンを返す */}
-//       <button type="submit" className="mt-4 btn btn-outline btn-success w-full"> 
-//         <FaSearch />
-//       </button>
-//     </form>
-//   );
-// }
