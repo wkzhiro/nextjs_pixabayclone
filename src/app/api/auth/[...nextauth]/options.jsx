@@ -1,7 +1,9 @@
 import GitHubProvider from 'next-auth/providers/github'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import db from '../../../../firebase'
-import { where, collection, getDocs, query } from "firebase/firestore"; 
+import { where, collection, getDocs, query } from "firebase/firestore";
+import bcrypt from 'bcryptjs';
+
 
 export const options = {
     providers: [
@@ -26,7 +28,8 @@ export const options = {
             async authorize(credentials) {
                 // Firestoreからユーザーデータを取得
                 const usersRef = collection(db, "registration");
-                const q = query(usersRef, where("name", "==", credentials.username), where("password", "==", credentials.password));
+                const q = query(usersRef, where('name', '==', credentials.username));
+                // const q = query(usersRef, where("name", "==", credentials.username), where("password", "==", credentials.password));
                 const querySnapshot = await getDocs(q);
 
                 // ユーザーが見つかった場合はそのデータを返す
@@ -36,11 +39,14 @@ export const options = {
                     // ユーザーのドキュメントIDをコンソールに出力
                     console.log("User ID:", userDoc.id);
                     console.log("User name:", user.name);
-
-                    return { id: userDoc.id, ...user };
-                } else {
+                    //ハッシュ用
+                    const isValid = bcrypt.compareSync(credentials.password, user.password);
+                    if (isValid){
+                        return { id: userDoc.id, ...user };}}
+                    
+                // } else {
                     return null;
-                }
+                // }
 
 
             }

@@ -13,9 +13,9 @@ export default function SignIn() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    // ハッシュ化したかったが、一旦ペンディング
-    // const hashedPassword = bcrypt.hashSync(password, 10);
-    const hashedPassword = password;
+    // ハッシュ化
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    // const hashedPassword = password;
 
     
     try {
