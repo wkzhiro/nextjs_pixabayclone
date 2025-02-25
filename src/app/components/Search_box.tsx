@@ -1,10 +1,9 @@
 import { useRef } from 'react'; // reactからuseRefをインポート
 import { FaSearch } from 'react-icons/fa'; // react-iconsからFaSearchをインポート
-import Count from './Count';
 
 
 export default function Search({ onSearch, count}) { // Search関数をエクスポート
-  const inputRef = useRef(); // useRefを使用してinputRefを定義
+  const inputRef = useRef<HTMLInputElement>(null); // useRefを使用してinputRefを定義
 
   const handleSubmit = (event) => { // handleSubmit関数を定義
     event.preventDefault(); // デフォルトのイベントを防止

@@ -1,9 +1,9 @@
 "use client"
 // 必要なフックとコンポーネントをインポート
 import { useState,useEffect } from 'react';
-import Search from './Search';
-import DisplayImages from './DisplayImages';
-import Count from './Count';
+import Search from './components/Search_box';
+import DisplayCards from './components/DisplayCards';
+import Count from './components/Count';
 import { useSession } from 'next-auth/react'
 import { redirect } from 'next/navigation'
 import UserCard from "./components/UserCard"
@@ -69,24 +69,12 @@ export default function Home() {
           </div>
         </div>
         <Middlebar onSearch={handleSearch} />
-        <DisplayImages images={fetchData} session={session} />
+        <DisplayCards images={fetchData} />
         </>
       ) : (
-        <>
-        <UserCard user={session?.user} pagetype={"Home"} />
-        <div className="container mx-auto flex flex-col items-center">
-          <div className="w-full md:w-3/4 lg:w-3/4 px-4"> {/* 中央揃えのためのラッパー要素 */}
-            <h1 className="text-3xl font-bold w-full text-left pt-20 mb-2">高品質なロイヤリティフリーの画像やストック素材</h1>
-            <p className="text-lg w-full text-left mb-4">多くのクリエイター達による、4.200万点以上の高品質な画像・動画素材。</p>
-            <div className="w-full  pb-20">
-              <Search onSearch={handleSearch} count={count}/>
-            </div>
-          </div>
-        </div>
-        <Middlebar onSearch={handleSearch} />
-        <DisplayImages images={fetchData.slice(0, 3)} session={session} />
-
-        </>
+        <div className="container mx-auto flex justify-center items-center h-screen">
+        <p className="text-xl font-bold">サインインして下さい</p>
+      </div>
       )}
     </>)
 }
