@@ -5,7 +5,7 @@ import Search from './components/Search_box';
 import DisplayCards from './components/DisplayCards';
 import Count from './components/Count';
 import { useSession } from 'next-auth/react'
-import { redirect } from 'next/navigation'
+// import { redirect } from 'next/navigation'
 import UserCard from "./components/UserCard"
 import Navbar from './components/Navbar';
 import Middlebar from './components/Middlebar';
@@ -58,23 +58,24 @@ export default function Home() {
       <Navbar />
       {session ? (
         <>
-        <UserCard user={session?.user} pagetype={"Home"} />
-        <div className="container mx-auto flex flex-col items-center">
-          <div className="w-full md:w-3/4 lg:w-3/4 px-4"> {/* 中央揃えのためのラッパー要素 */}
-            <h1 className="text-3xl font-bold w-full text-left pt-20 mb-2">高品質なロイヤリティフリーの画像やストック素材</h1>
-            <p className="text-lg w-full text-left mb-4">多くのクリエイター達による、4.200万点以上の高品質な画像・動画素材。</p>
-            <div className="w-full  pb-20">
-              <Search onSearch={handleSearch} count={count}/>
-            </div>
+          {/* <UserCard user={session?.user} pagetype={"Home"} /> */}
+          <div className="mt-[247px] mb-[161px]">
+            <Search onSearch={handleSearch} count={count} />
           </div>
-        </div>
-        <Middlebar onSearch={handleSearch} />
-        <DisplayCards images={fetchData} />
+          <Middlebar onSearch={handleSearch} />
+          <DisplayCards images={fetchData} />
         </>
       ) : (
         <div className="container mx-auto flex justify-center items-center h-screen">
-        <p className="text-xl font-bold">サインインして下さい</p>
+          <p className="text-xl font-bold">サインインして下さい</p>
+        </div>
+        )
+      }
+      <div className="mt-[247px] mb-[161px]">
+        <Search onSearch={handleSearch} count={count} />
       </div>
-      )}
-    </>)
+      <Middlebar onSearch={handleSearch} />
+      <DisplayCards images={fetchData} />
+    </>
+    )
 }
