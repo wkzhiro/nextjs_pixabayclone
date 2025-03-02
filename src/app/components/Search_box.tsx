@@ -23,6 +23,21 @@ export default function Search({ onSearch, count}) { // Search関数をエクス
 
   console.log(count)
   return (
+<<<<<<< HEAD
+    <form onSubmit={handleSubmit} className="mb-8 w-full mx-auto flex items-center bg-white rounded-full shadow-lg"> 
+    <button
+      type="submit"
+      className="bg-white p-2 rounded-full focus:outline-none transition-colors flex items-center justify-center">
+      <FaSearch className="text-gray-600 ml-6"/>
+    </button>
+    <input
+      ref={inputRef}
+      type="text"
+      name="keyword"
+      className="flex-grow rounded-r-full pl-4 py-4 text-gray-800 focus:outline-none"
+    />
+    </form>
+=======
     <div className="container mx-auto flex flex-col items-center">
       {/* 中央揃えのためのラッパー要素 */}
       <div className="w-full md:w-3/4 lg:w-3/4 px-4"> 
@@ -45,5 +60,6 @@ export default function Search({ onSearch, count}) { // Search関数をエクス
         <Middlebar onSearch={handleSearch}/>
       </div>
     </div>
+>>>>>>> bac19ba0e4e1acdb4877cbd0ab7592ec286c2d2d
   );
 }

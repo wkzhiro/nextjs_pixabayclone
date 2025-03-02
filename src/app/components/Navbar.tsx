@@ -13,6 +13,11 @@ export default function Navbar() {
   }
 
   return (
+<<<<<<< HEAD
+    <nav className="flex justify-between p-4">
+      <div className="text-2xl font-bold">GEEK PICTURES</div>
+      <div>
+=======
     <nav className="flex items-center justify-between pl-[168px] pr-4 pt-[16px] pb-[18px] border-b relative">
       {/* 左側ロゴ */}
       <div className="flex items-center space-x-2">
@@ -27,6 +32,7 @@ export default function Navbar() {
       {/* 右側：サインイン／サインアウト と 3点メニュー */}
       <div className="flex items-center space-x-6">
         {/* 既存のサインイン／サインアウト部分 */}
+>>>>>>> bac19ba0e4e1acdb4877cbd0ab7592ec286c2d2d
         {session ? (
           <a href="/api/auth/signout" className="block">
             <div className="bg-green-500 text-white px-6 py-2 rounded-full font-bold hover:bg-green-700 cursor-pointer">
@@ -35,12 +41,18 @@ export default function Navbar() {
             </div>
           </a>
         ) : (
+<<<<<<< HEAD
+        <div className="flex items-center space-x-4">
+            <span className="text-sm text-white text-gray-600">ログアウト中</span>
+            <a href="/api/auth/signin" className="bg-green-500 text-white px-12 py-2 rounded-full font-bold hover:bg-green-700 cursor-pointer">
+=======
           <div className="flex items-center space-x-4">
             {/* <span className="text-sm text-gray-600">未signin：表示数3 |</span> */}
             <a
               href="/api/auth/signin"
               className="bg-green-500 text-white px-6 py-2 rounded-full font-bold hover:bg-green-700 cursor-pointer"
             >
+>>>>>>> bac19ba0e4e1acdb4877cbd0ab7592ec286c2d2d
               Sign in
             </a>
             <a
