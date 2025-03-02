@@ -5,7 +5,7 @@ export default function Middlebar({ onSearch }) {
     const { data: session } = useSession();
   
     // タブのデータ配列
-    const tabs = ["クリスマス", "花", "春", "女性", "海", "夜", "通勤", "日本", "空", "自然", "カフェ"];
+    const tabs = ["職種", "媒体", "金額"];
   
     return (
       <div className="flex justify-center items-center space-x-4 bg-white p-4 shadow-md">
