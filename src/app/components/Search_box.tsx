@@ -21,7 +21,6 @@ export default function Search({ onSearch, count}) { // Search関数をエクス
       ref={inputRef}
       type="text"
       name="keyword"
-      placeholder='Pixabaycloneの全画像を検索'
       className="flex-grow rounded-r-full pl-4 py-4 text-gray-800 focus:outline-none"
     />
     </form>

@@ -61,8 +61,6 @@ export default function Home() {
         <UserCard user={session?.user} pagetype={"Home"} />
         <div className="container mx-auto flex flex-col items-center">
           <div className="w-full md:w-3/4 lg:w-3/4 px-4"> {/* 中央揃えのためのラッパー要素 */}
-            <h1 className="text-3xl font-bold w-full text-left pt-20 mb-2">高品質なロイヤリティフリーの画像やストック素材</h1>
-            <p className="text-lg w-full text-left mb-4">多くのクリエイター達による、4.200万点以上の高品質な画像・動画素材。</p>
             <div className="w-full  pb-20">
               <Search onSearch={handleSearch} count={count}/>
             </div>

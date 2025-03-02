@@ -7,7 +7,7 @@ export default function Navbar() {
 
   return (
     <nav className="flex justify-between p-4">
-      <div className="text-2xl font-bold">PicabayClone</div>
+      <div className="text-2xl font-bold">GEEK PICTURES</div>
       <div>
         {session ? (
           <>
@@ -20,7 +20,7 @@ export default function Navbar() {
           </>
         ) : (
         <div className="flex items-center space-x-4">
-            <span className="text-sm text-white text-gray-600">未singin：表示数3 |</span>
+            <span className="text-sm text-white text-gray-600">ログアウト中</span>
             <a href="/api/auth/signin" className="bg-green-500 text-white px-12 py-2 rounded-full font-bold hover:bg-green-700 cursor-pointer">
               Sign in
             </a>
