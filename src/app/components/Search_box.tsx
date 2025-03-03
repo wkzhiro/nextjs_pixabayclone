@@ -41,8 +41,9 @@ export default function Search({ onSearch, count}) { // Search関数をエクス
           />
         </form>
       </div>
-      <div className='mt-[36px]'>
-        <Middlebar onSearch={handleSearch}/>
+      {/* 2. Middlebarを配置する部分 */}
+      <div className="w-full md:w-3/4 lg:w-3/4 px-4 mt-[45px]">
+        <Middlebar onSearch={handleSearch} />
       </div>
     </div>
   );
