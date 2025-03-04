@@ -10,6 +10,7 @@ import UserCard from "./components/UserCard"
 import Navbar from './components/Navbar';
 import Middlebar from './components/Middlebar';
 import { FaSearch } from 'react-icons/fa';
+import Footer from './components/Footer';
 
 // メインのHomeコンポーネント
 export default function Home() {
@@ -56,26 +57,26 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      {session ? (
+      {/* ここから、一時的にコメントアウト */}
+      {/* {session ? ( */}
+      {/* ここまで、一時的にコメントアウト */}
         <>
-          {/* <UserCard user={session?.user} pagetype={"Home"} /> */}
           <div className="mt-[247px] mb-[161px]">
             <Search onSearch={handleSearch} count={count} />
           </div>
-          <Middlebar onSearch={handleSearch} />
+          {/* <Middlebar onSearch={handleSearch} /> */}
           <DisplayCards images={fetchData} />
+          <Footer />
         </>
-      ) : (
+      {/* ここから、一時的にコメントアウト */}
+      {/* ) : (
         <div className="container mx-auto flex justify-center items-center h-screen">
           <p className="text-xl font-bold">サインインして下さい</p>
         </div>
         )
-      }
-      <div className="mt-[247px] mb-[161px]">
-        <Search onSearch={handleSearch} count={count} />
-      </div>
-      <Middlebar onSearch={handleSearch} />
-      <DisplayCards images={fetchData} />
+      } */}
+      {/* ここまで、一時的にコメントアウト */}
+
     </>
     )
 }

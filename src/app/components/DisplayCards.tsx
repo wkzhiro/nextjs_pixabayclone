@@ -8,7 +8,7 @@ export default function DisplayCards({ images }) {
   console.log("datalist", datalist)
 
   return (
-    <div className="grid grid-cols-3 gap-4 p-8 bg-white">
+    <div className="grid grid-cols-3 gap-4 p-8 bg-[#F2F6F9]">
       {datalist.map((data, index) => (
         <BusinessCard
           key={index}
