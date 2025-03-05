@@ -8,13 +8,13 @@ export interface FilterSectionProps {
   items: FilterItemProps[];
 }
 
-export interface PaginationProps {
-  currentPage: number;
-  totalItems: number;
-  itemsPerPage: number;
-  onPrevious: () => void;
-  onNext: () => void;
-}
+// export interface PaginationProps {
+//   currentPage: number;
+//   totalItems: number;
+//   itemsPerPage: number;
+//   onPrevious: () => void;
+//   onNext: () => void;
+// }
 
 export interface InfoRowProps {
   label: string;
@@ -42,4 +42,14 @@ export interface BusinessCardProps {
   fileType: string;
   title: string; // 作品の説明文（複数行も可能）
   work:string;
+}
+
+export interface PaginationProps {
+  currentPage: number;
+  totalItems: number;
+  itemsPerPage: number;
+  startItem: number;
+  endItem: number;
+  onPrevious: () => void;
+  onNext: () => void;
 }
