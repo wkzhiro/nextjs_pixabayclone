@@ -1,8 +1,6 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { InfoRow } from "./InfoRow";
 import { Tag } from "./Tag";
 import { BusinessCardProps } from "@/types/businesscard";
 
@@ -17,7 +15,6 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
   work          // 作品画像のURL
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   // モーダル処理は必要な場合のみ利用
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -34,63 +31,76 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
   }, [isModalOpen]);
 
   return (
-    <div className="max-w-md w-full mx-auto bg-white rounded-lg shadow p-6">
-      {/* 上部: プロフィール写真＋氏名＆問い合わせ先 */}
-      <div className="flex items-center space-x-4 p-4 w-full h-40">
-        {/* 左側: 画像 + タグ */}
-        <div className="w-1/2 flex flex-col items-center">
+    <div className="w-full max-w-md bg-white border border-gray-300 rounded-md shadow-sm overflow-hidden">
+      {/* 黒いバーを最上部に配置 */}
+      <div className="bg-black w-full h-2" />
+      {/* 上部: 顔写真 + タグ（左） と 名前 + 連絡先（右） */}
+      <div className="p-4 flex flex-col md:flex-row md:items-start md:justify-center">
+        {/* 左側：顔写真＆タグ */}
+        <div className="md:w-1/2 flex flex-col items-center md:items-start">
           <Link href={`/profile/${uuid}`}>
-            <div className="relative w-20 h-20 cursor-pointer">
+            <div className="relative w-24 h-24 rounded-full overflow-hidden mb-2 cursor-pointer">
               <Image
                 src={image}
                 alt={personInfo.name}
                 fill
-                sizes="(max-width: 50px) 100vw"
-                className="rounded-lg object-cover"
+                className="object-cover"
               />
             </div>
           </Link>
-          {/* タグ（ディレクターなど） */}
-          <div className="flex flex-wrap gap-2 mt-2">
-            {tags.map((tag, index) => (
-              <Tag key={index} text={tag} />
-            ))}
-          </div>
+          {/* タグ */}
+          {tags && tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag, index) => (
+                <Tag key={index} text={tag} />
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* 右側: 氏名 + 問い合わせ先 */}
-        <div className="w-1/2 flex flex-col">
-          <div className="text-xl font-bold text-black">
-            {personInfo.name}
+        {/* 右側：名前 + 連絡先 */}
+        <div className="mt-4 md:mt-0 md:w-1/2 md:ml-4 flex flex-col items-center md:items-start">
+          {/* 名前・英名 */}
+          <h2 className="text-xl font-bold text-gray-800">{personInfo.name}</h2>
+          <p className="text-sm text-gray-500 mb-4">{personInfo.englishname}</p>
+
+          {/* 連絡先 */}
+          <div className="flex items-center text-gray-700 mb-2">
+            <span className="inline-block w-5 mr-2">💼</span>
+            <span>{personInfo.department}</span>
           </div>
-          <div className="text-sm text-gray-600">
-            {personInfo.englishname}
+          <div className="flex items-center text-gray-700 mb-2">
+            <span className="inline-block w-5 mr-2">📞</span>
+            <span>{personInfo.phone}</span>
           </div>
-          <div className="flex flex-col h-20 justify-center">
-            <InfoRow 
-              label="問い合わせ先" 
-              company={personInfo.department} 
-              phone={personInfo.phone} 
-              email={personInfo.email} 
-            />
+          <div className="flex items-center text-gray-700">
+            <span className="inline-block w-5 mr-2">✉️</span>
+            <span className="text-[8px]">{personInfo.email}</span>
           </div>
         </div>
       </div>
-      
-      {/* 区切り線 */}
-      <hr className="my-4 border-gray-300" />
 
-      {/* 作品画像＋説明文 */}
-      <div className="flex flex-col items-center h-30">
-        <Image
-          src={work}
-          alt="作品画像"
-          width={300}
-          height={180}
-          className="object-contain cursor-pointer"
-          onClick={openModal} // 作品画像クリック時はモーダル表示（必要なら残す）
-        />
-        <p className="mt-3 text-sm text-gray-700 text-center whitespace-pre-line">
+      {/* 仕切り線 */}
+      <hr className="border-[#E2E2E2] mx-4" />
+
+      {/* 下部: 作品画像 + タイトル + 日付 */}
+      <div className="px-4 py-4 flex flex-col items-start">
+        {/* 作品画像 */}
+        <div
+          className="w-full h-auto mb-3 cursor-pointer"
+          onClick={openModal}
+        >
+          <Image
+            src={work}
+            alt="作品画像"
+            width={600}
+            height={350}
+            className="object-cover rounded-md"
+          />
+        </div>
+
+        {/* タイトル・日付 */}
+        <p className="text-left text-gray-800 text-sm whitespace-pre-line">
           {title}
           <br />
           {date}
