@@ -23,60 +23,111 @@ export default function Home() {
     }
   })
 
-
-  // フェッチしたデータを保存するためのステート
-  const [fetchData, setFetchData] = useState([]);
+  // 初期データ用
+  const [initialFetchData, setInitialFetchData] = useState([]);
+  // 表示用のデータ（初期表示時は初期データと同じ）
+  const [displayData, setDisplayData] = useState([]);
+  // ローディング状態
+  const [loading, setLoading] = useState(false);
   const [count, setCount] = useState(0);
-  // 初期検索ワードを設定
-  const initialKeyword = '';
-  // コンポーネントがマウントされたときに一度だけ検索を実行
+
   useEffect(() => {
-    handleSearch(initialKeyword);
-  }, []);
+    if (session && displayData.length === 0) {
+      handleSearch();
+    }
+  }, [session, displayData]);
 
-  // 検索とデータのフェッチを処理する関数
-  const handleSearch = async (keyword) => {
-    // Pixabay APIのエンドポイントURL
-    const endpointURL = `https://pixabay.com/api/?key=${process.env.NEXT_PUBLIC_PIXABAY_API_KEY}&q=${keyword}&image_type=photo`;
-
-    // APIからデータをフェッチ
-    const res = await fetch(endpointURL);
-    // レスポンスをJSONにパース
-    const data = await res.json();
-    // 必要なデータを抽出
-    const fetchData_raw = data.hits;
-
-    // フェッチしたデータでステートを更新
-    setFetchData(fetchData_raw);
-    
-    // カウントを増やす
-    setCount((prev) => prev + 1)
+  // データをフェッチする関数
+  const handleSearch = async () => {
+    setLoading(true); // fetch開始前にloadingをtrue
+    try {
+      const endpointURL = `http://127.0.0.1:8000/api/v1/creators/first`;
+      const res = await fetch(endpointURL);
+      const data = await res.json();
+      console.log("data", data);
+      setInitialFetchData(data);
+      // setCount((prev) => prev + 1);
+    } catch (error) {
+      console.error("Fetch error:", error);
+    } finally {
+      setLoading(false); // fetch完了後にloadingをfalse
+    }
   };
 
-  // コンポーネントのレンダリング
-  return (
-    <>
-      <Navbar />
-      {/* ここから、一時的にコメントアウト */}
-      {/* {session ? ( */}
-      {/* ここまで、一時的にコメントアウト */}
-        <>
-          <div className="mt-[247px] mb-[161px]">
-            <Search onSearch={handleSearch} count={count} />
-          </div>
-          {/* <Middlebar onSearch={handleSearch} /> */}
-          <DisplayCards images={fetchData} />
-          <Footer />
-        </>
-      {/* ここから、一時的にコメントアウト */}
-      {/* ) : (
+
+  useEffect(() => {
+    if (initialFetchData.length > 0 && displayData.length === 0) {
+      setDisplayData(initialFetchData);
+    }
+  }, [initialFetchData]);
+
+  // ログインしていない場合のガード
+  if (!session) {
+    return (
+      <>
+        <Navbar />
         <div className="container mx-auto flex justify-center items-center h-screen">
           <p className="text-xl font-bold">サインインして下さい</p>
         </div>
-        )
-      } */}
-      {/* ここまで、一時的にコメントアウト */}
+      </>
+    );
+  }
 
+  // ローディング中ならスピナーを表示
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="mt-[247px] mb-[161px]">
+          <Search onSearch={handleSearch} count={count} />
+        </div>
+        <div className="pb-[300px] bg-[#F2F6F9]">
+          Loading...
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  // ローディングが終わったら通常のUIを表示
+  return (
+    <>
+      <Navbar />
+      <div className="mt-[247px] mb-[161px]">
+        <Search onSearch={handleSearch} count={count} />
+      </div>
+      <DisplayCards images={displayData} />
+      <Footer />
     </>
-    )
+  );
+
+  // コンポーネントのレンダリング
+  // return (
+  //   <>
+  //     <Navbar />
+  //     {session ? (
+  //       <>
+  //         <div className="mt-[247px] mb-[161px]">
+  //           <Search onSearch={handleSearch} count={count} />
+  //         </div>
+  //         {/* <Middlebar onSearch={handleSearch} /> */}
+  //         <DisplayCards images={displayData} />
+  //         <Footer />
+  //         <div className="flex justify-center mb-8">
+  //         {/* <button
+  //           onClick={handleSearch}
+  //           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+  //         >
+  //           データを取得
+  //         </button> */}
+  //       </div>
+  //       </>
+  //     ) : (
+  //       <div className="container mx-auto flex justify-center items-center h-screen">
+  //         <p className="text-xl font-bold">サインインして下さい</p>
+  //       </div>
+  //       )
+  //     }
+  //   </>
+  //   )
 }
