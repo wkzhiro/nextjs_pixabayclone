@@ -32,16 +32,17 @@ export interface BusinessCardProps {
   image: string;
   personInfo: {
     name: string;
-    englishname: string;
+    name_furigana: string;
     department: string;
-    phone: string;
-    email: string;
+    mobile_phone: string;
+    personal_email: string;
   };
   tags: string[];
   date: string;
   fileType: string;
   title: string; // 作品の説明文（複数行も可能）
   work:string;
+  company:string;
 }
 
 export interface PaginationProps {

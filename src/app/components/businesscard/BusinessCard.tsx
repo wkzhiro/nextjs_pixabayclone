@@ -12,7 +12,8 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
   date,         // 例: "2022年"
   fileType,     // 例: "動画"
   title,        // 作品タイトル（説明文）
-  work          // 作品画像のURL
+  work,
+  company          // 作品画像のURL
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   // モーダル処理は必要な場合のみ利用
@@ -40,6 +41,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
         <div className="md:w-1/2 flex flex-col items-center md:items-start">
           <Link href={`/profile/${uuid}`}>
             <div className="relative w-24 h-24 rounded-full overflow-hidden mb-2 cursor-pointer">
+              {/* 本来はsrcにimageを入れる */}
               <Image
                 src={image}
                 alt={personInfo.name}
@@ -62,20 +64,20 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
         <div className="mt-4 md:mt-0 md:w-1/2 md:ml-4 flex flex-col items-center md:items-start">
           {/* 名前・英名 */}
           <h2 className="text-xl font-bold text-gray-800">{personInfo.name}</h2>
-          <p className="text-sm text-gray-500 mb-4">{personInfo.englishname}</p>
+          <p className="text-sm text-gray-500 mb-4">{personInfo.name_furigana}</p>
 
           {/* 連絡先 */}
           <div className="flex items-center text-gray-700 mb-2">
             <span className="inline-block w-5 mr-2">💼</span>
-            <span>{personInfo.department}</span>
+            <span className="text-[8px]">{company}</span>
           </div>
           <div className="flex items-center text-gray-700 mb-2">
             <span className="inline-block w-5 mr-2">📞</span>
-            <span>{personInfo.phone}</span>
+            <span className="text-[10px]">{personInfo.mobile_phone}</span>
           </div>
           <div className="flex items-center text-gray-700">
             <span className="inline-block w-5 mr-2">✉️</span>
-            <span className="text-[8px]">{personInfo.email}</span>
+            <span className="text-[8px]">{personInfo.personal_email}</span>
           </div>
         </div>
       </div>
@@ -90,8 +92,9 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
           className="w-full h-auto mb-3 cursor-pointer"
           onClick={openModal}
         >
+          {/* 本来はsrcにworkを入れる */}
           <Image
-            src={work}
+            src="https://picsum.photos/300/180?random=1"
             alt="作品画像"
             width={600}
             height={350}

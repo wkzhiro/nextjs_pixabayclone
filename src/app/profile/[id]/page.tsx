@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { dummyData } from "@/data/dummyData";
@@ -19,23 +19,53 @@ export default function ProfilePage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id;
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // id がまだ取得できていない場合はローディング表示
   if (!id) {
     return <div>Loading...</div>;
   }
+  console.log("test")
 
-  // uuid に一致するデータを取得
-  const profile = dummyData.find((item) => item.uuid === id);
+  // データ取得
+  useEffect(() => {
+    if (!id) return;
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(`http://127.0.0.1:8000/api/v1/creator/${id}`);
+        if (!res.ok) {
+          throw new Error("Failed to fetch profile data");
+        }
+        const data = await res.json();
+        console.log("detail",data)
+        setProfile(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, [id]);
 
-  if (!profile) {
-    return <div>Profile not found</div>;
-  }
 
-  // 関連作品のcost（制作費）の最小値と最大値を算出
-  const workCosts = profile.relatedWorks?.map((work) => work.cost) || [];
-  const minCost = workCosts.length > 0 ? Math.min(...workCosts) : 0;
-  const maxCost = workCosts.length > 0 ? Math.max(...workCosts) : 0;
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  // if (!detailprofile) return <div>Profile not found</div>;
+  // // dummyデータ処理 //
+  // // uuid に一致するデータを取得
+  // const dummyprofile = dummyData.find((item) => item.uuid === id);
+  // if (!dummyprofile) {
+  //   return <div>Profile not found</div>;
+  // }
+  // // 関連作品のcost（制作費）の最小値と最大値を算出
+  // const workCosts = dummyprofile.relatedWorks?.map((work) => work.cost) || [];
+  // const minCost = workCosts.length > 0 ? Math.min(...workCosts) : 0;
+  // const maxCost = workCosts.length > 0 ? Math.max(...workCosts) : 0;
+  // ////////////////////
 
   return (
     <div className="w-full">
@@ -55,8 +85,9 @@ export default function ProfilePage() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center p-4">
           {/* 左側: プロフィール写真 */}
           <div className="relative w-[360px] h-[360px] mb-4 md:mb-0 md:mr-6 shrink-0">
+            {/* {profile.creator.file_name}を一旦仮 */}
             <Image
-              src={profile.image}
+              src="https://randomuser.me/api/portraits/men/1.jpg"
               alt="プロフィール写真"
               fill
               sizes="(max-width: 360px) 100vw"
@@ -71,16 +102,20 @@ export default function ProfilePage() {
               {/* 左側: タグ、名前、英語名 */}
               <div className="mr-8">
                 {/* 役職やタグ */}
-                <div className="text-s text-black mb-1">{profile.tags}</div>
+                <div className="text-s text-black mb-1">
+                  {profile.creator.occupations
+                    .map((occ: any) => occ.occupation_name)
+                    .join(", ")}
+                </div>
 
                 {/* 氏名と英語名を横並びに */}
                 <div className="flex items-center mb-4">
                   <h1 className="text-3xl font-bold text-black mr-3">
-                    {profile.personInfo.name}
+                    {profile.creator.name}
                   </h1>
-                  {profile.personInfo.englishname && (
+                  {profile.creator.name_furigana && (
                     <h2 className="text-sm text-black mt-3">
-                      {profile.personInfo.englishname}
+                      {profile.creator.name_furigana}
                     </h2>
                   )}
                 </div>
@@ -106,51 +141,67 @@ export default function ProfilePage() {
                   </button>
                 </div>
               </div>
+              {/* ここまでできている */}
 
               {/* 右側: 会社名、ポートフォリオ、インスタグラム */}
               <div className="flex flex-col gap-1 text-sm text-gray-700">
                 {/* 会社名 */}
                 <div className="flex items-center mt-6 mb-2 gap-2">
                   <FaBuilding className="text-black" />
-                  <p>{profile.companyName}</p>
+                  <p>{profile.creator.company.company_name ?? "N/A"}</p>
                 </div>
                 {/* ポートフォリオサイト */}
-                <div className="flex items-center mb-2 gap-2">
-                  <FaGlobe className="text-black" />
-                  <a
-                    href={profile.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline break-all"
-                  >
-                    {profile.website}
-                  </a>
-                </div>
+                {profile.creator.portfolio_site ? (
+                  <div className="flex items-center mb-2 gap-2">
+                    <FaGlobe className="text-black" />
+                    <a
+                      href={profile.creator.portfolio_site}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline break-all"
+                    >
+                      {profile.creator.portfolio_site}
+                    </a>
+                  </div>
+                ) : (
+                  // 必要であれば、ポートフォリオがない場合の代替表示（不要なら何も表示しない）
+                  <div className="flex items-center mb-2 gap-2">
+                    <FaGlobe className="text-black" />
+                    N/A
+                  </div>
+                )}
+
                 {/* インスタグラム */}
-                <div className="flex items-center mb-2 gap-2">
-                  <FaInstagram className="text-black" />
-                  <a
-                    href={profile.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline break-all"
-                  >
-                    {profile.instagram}
-                  </a>
-                </div>
+                {profile.creator.instagram ? (
+                  <div className="flex items-center mb-2 gap-2">
+                    <FaInstagram className="text-black" />
+                    <a
+                      href={profile.creator.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline break-all"
+                    >
+                      {profile.creator.instagram}
+                    </a>
+                  </div>
+                ) : (
+                  <div className="flex items-center mb-2 gap-2">
+                    <FaInstagram className="text-black" />
+                    N/A
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="space-y-20 mt-8">
               <hr className="border-t border-black" />
               <div className="text-sm ml-2 text-gray-800 leading-relaxed">
-                {profile.bio}
+                {profile.creator.bio ?? "只今、経歴の更新を行っております。"}
               </div>
               <hr className="border-t border-black" />
             </div>
           </div>
         </div>
-
         {/* Contact セクション */}
         <div className="max-w-3xl mx-auto my-8 bg-white border border-black border-1 shadow rounded p-8">
           <div className="flex items-center gap-8 ml-8">
@@ -160,19 +211,19 @@ export default function ProfilePage() {
               {/* Manager */}
               <div className="flex items-center gap-4">
                 Manager
-                <span>{profile.contactInfo?.managerName}</span>
+                <span>{profile.creator.inquiry_contact.inquiry_responsible_person ?? "N/A"}</span>
               </div>
 
               {/* 電話アイコン + 電話番号 */}
               <div className="flex items-center gap-4">
                 <FaPhone className="text-black" />
-                <span>{profile.contactInfo?.managerPhone}</span>
+                <span>{profile.creator.inquiry_contact.inquiry_phone ?? "N/A"}</span>
               </div>
 
               {/* メールアイコン + メールアドレス */}
               <div className="flex items-center gap-4">
                 <FaEnvelope className="text-black" />
-                <span>{profile.contactInfo?.managerEmail}</span>
+                <span>{profile.creator.inquiry_contact.inquiry_email ?? "N/A"}</span>
               </div>
             </div>
           </div>
@@ -187,16 +238,17 @@ export default function ProfilePage() {
             <div className="mb-8 flex items-center">
               <h2 className="text-2xl font-bold mr-12">Related Works</h2>
               <span className="text-2xl text-gray-500">
-                {profile.relatedWorks?.length}件
+                {profile.relatedworks?.length}件
               </span>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {profile.relatedWorks &&
-                profile.relatedWorks.map((work, i) => (
+              {profile.relatedworks &&
+                profile.relatedworks.map((work:any, i:number) => (
                   <div key={i} className="rounded overflow-hidden">
                     <div className="relative w-[360px] h-[206px] mx-auto">
+                    {/* srcは本来はこれ{work.product_image_path} */}
                       <Image
-                        src={work.image}
+                        src="https://picsum.photos/300/180?random=1"
                         alt={`work-${i}`}
                         fill
                         sizes="(max-width: 100%)"
@@ -205,7 +257,7 @@ export default function ProfilePage() {
                     </div>
                     <div className="p-2 text-s mb-4">
                       <div className="text-black mt-1 mb-1">{work.title}</div>
-                      <div className="text-black">{work.description}</div>
+                      <div className="text-black">{work.product_number}</div>
                     </div>
                     {/* Producer / PM ボタンと担当者 */}
                     <div className="flex flex-wrap gap-4">
@@ -213,13 +265,13 @@ export default function ProfilePage() {
                         <div className="bg-black text-sm text-white rounded px-3 py-2 mr-4 w-[104px] h-[26px] flex items-center justify-center">
                           Producer
                         </div>
-                        <span>{work.producer}</span>
+                        <span>{work.associated_employees?.Producer?.employee_name ?? "N/A"}</span>
                       </div>
                       <div className="flex items-center">
                         <div className="bg-black text-sm text-white rounded px-3 py-2 mr-4 w-[104px] h-[26px] flex items-center justify-center">
                           PM
                         </div>
-                        <span>{work.pm}</span>
+                        <span>{work.associated_employees?.PM?.employee_name ?? "N/A"}</span>
                       </div>
                     </div>
                   </div>
@@ -231,15 +283,15 @@ export default function ProfilePage() {
           <div className="mb-8">
             <h2 className="text-2xl font-bold mb-8">Related Staff</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {profile.relatedStaff &&
-                profile.relatedStaff.map((staff, i) => (
+              {profile.relatedstaff &&
+                profile.relatedstaff.map((staff:any, i:number) => (
                   <div
                     key={i}
                     className="flex flex-col items-center justify-center"
                   >
                     <div className="relative w-[200px] h-[200px] mx-auto mb-1">
                       <Image
-                        src={staff.image}
+                        src="https://randomuser.me/api/portraits/men/1.jpg"
                         alt={staff.name}
                         fill
                         sizes="(max-width: 100%)"
@@ -247,7 +299,7 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div className="bg-black text-sm text-white rounded px-3 py-1 my-3 w-[104px] h-[26px] flex items-center justify-center">
-                      PM
+                      {staff.occupations.map((occ: any) => occ.occupation_name ?? "N/A")}
                     </div>
                     <div className="text-sm font-bold text-gray-700">
                       {staff.name}
@@ -269,20 +321,20 @@ export default function ProfilePage() {
 
                   <div className="flex items-start mb-2 mx-10 gap-2">
                     <FaBuilding className="text-gray-600 mt-1 mr-2" />
-                    <div>{profile.basicInfo.affiliation.companyName}</div>
+                    <div>{profile.creator.company.company_name ?? "N/A"}</div>
                   </div>
 
                   <div className="flex items-start mb-2 mx-10 gap-2">
                     <FaUserShield className="text-gray-600 mt-1 mr-2" />
-                    <div>{profile.basicInfo.affiliation.manager}</div>
+                    <div>{profile.creator.inquiry_contact.inquiry_responsible_person ?? "N/A"}</div>
                   </div>
 
                   <div className="flex items-start mb-2 mx-10 gap-2">
                     <FaMapMarkerAlt className="text-gray-600 mt-1 mr-2" />
                     <div>
-                      {profile.basicInfo.affiliation.postalCode}
+                      {profile.creator.company.com_postal_code ?? ""}
                       <br />
-                      {profile.basicInfo.affiliation.address}
+                      {profile.creator.company.com_address ?? "N/A"}
                     </div>
                   </div>
                   <hr className="my-4 mx-2" />
@@ -290,34 +342,42 @@ export default function ProfilePage() {
                   <div className="flex items-start mb-2 mx-10 gap-2">
                     <FaPhone className="text-gray-600 mt-1 mr-2" />
                     <div>
-                      {profile.basicInfo.affiliation.phone.map((phone, index) => (
+                      {profile.creator.company.contact_phone ?? "N/A"}
+                      {/* {profile.basicInfo.affiliation.phone.map((phone, index) => (
                         <div key={index}>{phone}</div>
-                      ))}
+                      ))} */}
                     </div>
                   </div>
 
                   <div className="flex items-start mb-2 mx-10 gap-2">
                     <FaFax className="text-gray-600 mt-1 mr-2" />
-                    <div>{profile.basicInfo.affiliation.fax}</div>
+                    <div>{profile.creator.company.contact_fax ?? "N/A"}</div>
                   </div>
                   <hr className="my-4 mx-2" />
 
                   <div className="flex items-start mb-2 mx-10 gap-2">
                     <FaEnvelope className="text-gray-600 mt-1 mr-2" />
-                    <div>{profile.basicInfo.affiliation.email}</div>
+                    <div>{profile.creator.company.contact_email ?? "N/A"}</div>
                   </div>
 
-                  <div className="flex items-start mb-2 mx-10 gap-2">
-                    <FaGlobe className="text-gray-600 mt-1 mr-2" />
-                    <a
-                      href={profile.basicInfo.affiliation.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 underline break-all"
-                    >
-                      {profile.basicInfo.affiliation.website}
-                    </a>
-                  </div>
+                  {profile.creator.company.website ? (
+                    <div className="flex items-start mb-2 mx-10 gap-2">
+                      <FaGlobe className="text-gray-600 mt-1 mr-2" />
+                      <a
+                        href={profile.creator.company.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline break-all"
+                      >
+                        {profile.creator.company.website}
+                      </a>
+                    </div>
+                  ) : (
+                    <div className="flex items-start mb-2 mx-10 gap-2">
+                      <FaGlobe className="text-gray-600 mt-1 mr-2" />
+                      N/A
+                    </div>
+                  )}
                 </div>
 
                 {/* 右カラム：個人 */}
@@ -328,38 +388,46 @@ export default function ProfilePage() {
                   <div className="flex items-start mb-2 mx-10 mt-20 gap-2">
                     <FaMapMarkerAlt className="text-gray-600 mt-1 mr-2" />
                     <div>
-                      {profile.basicInfo.personal.postalCode}
+                      {profile.creator.addresses[0].postal_code ?? "N/A"}
                       <br />
-                      {profile.basicInfo.personal.address}
+                      {profile.creator.addresses?.[0]?.state ? (
+                        <div>
+                          {profile.creator.addresses[0].state}
+                          {profile.creator.addresses[0].city}
+                          {profile.creator.addresses[0].address_line}
+                        </div>
+                      ) : (
+                        <div>N/A</div>
+                      )}
                     </div>
                   </div>
                   <hr className="my-4 mx-2" />
-
                   <div className="flex items-start mb-2 mx-10 gap-2">
                     <FaPhone className="text-gray-600 mt-1 mr-2" />
-                    <div>{profile.basicInfo.personal.phone}</div>
+                    <div>{profile.creator.personal_contact.home_phone ?? "N/A"}</div>
                   </div>
 
                   <div className="flex items-start mb-10 mx-10 gap-2">
                     <FaFax className="text-gray-600 mt-1 mr-2" />
-                    <div>{profile.basicInfo.personal.fax}</div>
+                    <div>{profile.creator.personal_contact.fax_number ?? "N/A"}</div>
                   </div>
                   <hr className="my-4 mx-2" />
 
                   <div className="flex items-start mb-2 mx-10 gap-2">
                     <FaEnvelope className="text-gray-600 mt-1 mr-2" />
-                    <div>{profile.basicInfo.personal.email}</div>
+                    <div>{profile.creator.personal_contact.personal_email ?? "N/A"}</div>
                   </div>
 
                   <div className="flex items-start mb-2 mx-10 gap-2">
                     <FaGlobe className="text-gray-600 mt-1 mr-2" />
+                    portfolio_siteでいいのか？
                     <a
-                      href={profile.basicInfo.personal.website}
+                      href={profile.creator.portfolio_site}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 underline break-all"
                     >
-                      {profile.basicInfo.personal.website}
+                      {profile.creator.portfolio_site ?? "N/A"}
                     </a>
                   </div>
                 </div>
@@ -374,7 +442,8 @@ export default function ProfilePage() {
               <div className="border-l border-gray-300 h-6" />
               <div className="flex-1 flex items-center justify-center text-center mr-32">
                 <span className="text-base">
-                  最小 {minCost} 万円　～　最大 {maxCost} 万円
+                  DB更新まち
+                  {/* 最小 {minCost} 万円　～　最大 {maxCost} 万円 */}
                 </span>
               </div>
             </div>
@@ -384,3 +453,6 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+
+

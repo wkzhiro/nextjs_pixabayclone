@@ -5,8 +5,8 @@ import { dummyData } from "@/data/dummyData"; // エイリアス設定に合わ�
 import { Pagination } from "./Pagination";
 
 export default function DisplayCards({ images }) {
-  const datalist = dummyData
-  // console.log("datalist", datalist)
+  // const datalist = dummyData
+  const datalist = images
 
   const [currentPage, setCurrentPage] = useState(1);
   // 1ページあたりのアイテム数
@@ -43,17 +43,19 @@ export default function DisplayCards({ images }) {
           該当者：{totalItems}名
         </p>
         <div className="grid grid-cols-3 gap-4">
+          {/* imageは本来file_nameだが一旦仮置き,work={data.product_image_path}も */}
           {currentItems.map((data, index) => (
             <BusinessCard
               key={index}
-              uuid={data.uuid}
-              image={data.image}
+              uuid={data.creator_id}
+              image={data.file_path}
               personInfo={data.personInfo}
-              tags={data.tags}
-              date={data.date}
+              tags={data.occupations}
+              date={data.product_number}
               fileType={data.fileType}
-              title={data.title}
-              work={data.work}
+              title={data.product_title}
+              work={data.product_image_path}
+              company={data.company_name}
             />
           ))}
         </div>
