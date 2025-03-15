@@ -7,6 +7,7 @@ import { Pagination } from "./Pagination";
 export default function DisplayCards({ images }) {
   // const datalist = dummyData
   const datalist = images
+  console.log("datalist",datalist)
 
   const [currentPage, setCurrentPage] = useState(1);
   // 1ページあたりのアイテム数
@@ -47,15 +48,19 @@ export default function DisplayCards({ images }) {
           {currentItems.map((data:any, index:any) => (
             <BusinessCard
               key={index}
-              uuid={data.creator_id}
-              image={data.file_path}
+               name={data.name}
+              furigana={data.name_furigana}
+               uuid={data.creator_id}
+               image={data.file_name}
               personInfo={data.personInfo}
-              tags={data.occupations}
-              date={data.product_number}
+               tags={data.occupations}
+               date={data.product_number || data.latest_product_number}
               fileType={data.fileType}
-              title={data.product_title}
-              work={data.product_image_path}
-              company={data.company_name}
+               title={data.product_title || data.latest_product_title}
+               work={data.product_image_path || data.latest_product_image_path}
+               company={data.company_name}
+               inquiry_email={data.inquiry_email || data.latest_inquiry_email}
+               inquiry_phone={data.inquiry_phone || data.latest_inquiry_phone}
             />
           ))}
         </div>

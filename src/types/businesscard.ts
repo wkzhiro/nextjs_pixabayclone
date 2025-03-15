@@ -30,6 +30,8 @@ export interface TagProps {
 export interface BusinessCardProps {
   uuid:string;
   image: string;
+  name:string;
+  furigana:string;
   personInfo: {
     name: string;
     name_furigana: string;
@@ -43,6 +45,8 @@ export interface BusinessCardProps {
   title: string; // 作品の説明文（複数行も可能）
   work:string;
   company:string;
+  inquiry_email:string;
+  inquiry_phone:string;
 }
 
 export interface PaginationProps {

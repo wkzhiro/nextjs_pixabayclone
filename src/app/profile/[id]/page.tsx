@@ -15,6 +15,15 @@ import {
   FaFax,
 } from "react-icons/fa";
 
+function isValidUrl(value:string) {
+  try {
+    new URL(value);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const params = useParams();
@@ -27,8 +36,6 @@ export default function ProfilePage() {
   if (!id) {
     return <div>Loading...</div>;
   }
-  console.log("test")
-
   // データ取得
   useEffect(() => {
     if (!id) return;
@@ -39,7 +46,41 @@ export default function ProfilePage() {
           throw new Error("Failed to fetch profile data");
         }
         const data = await res.json();
-        console.log("detail",data)
+        
+        const tempo_res = await fetch(`/api/get_staff_imaga_by_azure_storage?fileName=${data.creator.file_name}`);
+        if (!tempo_res.ok) {
+          throw new Error("Failed to fetch profile data");
+        }
+        const tempo_data = await tempo_res.json();
+        data.creator.file_name = tempo_data.url
+        
+        // relatedstaff があれば、それぞれの file_name を BlobURL に置き換える
+        if (data.relatedstaff && Array.isArray(data.relatedstaff)) {
+          // Promise.all で並列実行して結果を待つ
+          const updatedStaff = await Promise.all(
+            data.relatedstaff.map(async (staff: any) => {
+              // file_name がなければスキップ
+              if (!staff.file_name) return staff;
+              const fileName = encodeURIComponent(staff.file_name);
+              const resBlob = await fetch(`/api/get_staff_imaga_by_azure_storage?fileName=${fileName}`);
+              if (!resBlob.ok) {
+                console.error(`Failed to fetch blob for ${staff.file_name}`);
+                return staff; // 失敗時は元のデータを返す
+              }
+              const blobData = await resBlob.json();
+              
+              // staffのfile_name を SAS URL に置き換え
+              return {
+                ...staff,
+                file_name: blobData.url
+              };
+            })
+          );
+
+          // 3. 変換した配列を data に再セット
+          data.relatedstaff = updatedStaff;
+        }
+        console.log(data)
         setProfile(data);
       } catch (err: any) {
         setError(err.message);
@@ -50,22 +91,8 @@ export default function ProfilePage() {
     fetchProfile();
   }, [id]);
 
-
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
-
-  // if (!detailprofile) return <div>Profile not found</div>;
-  // // dummyデータ処理 //
-  // // uuid に一致するデータを取得
-  // const dummyprofile = dummyData.find((item) => item.uuid === id);
-  // if (!dummyprofile) {
-  //   return <div>Profile not found</div>;
-  // }
-  // // 関連作品のcost（制作費）の最小値と最大値を算出
-  // const workCosts = dummyprofile.relatedWorks?.map((work) => work.cost) || [];
-  // const minCost = workCosts.length > 0 ? Math.min(...workCosts) : 0;
-  // const maxCost = workCosts.length > 0 ? Math.max(...workCosts) : 0;
-  // ////////////////////
 
   return (
     <div className="w-full">
@@ -86,7 +113,7 @@ export default function ProfilePage() {
           {/* 左側: プロフィール写真 */}
           <div className="relative w-[360px] h-[360px] mb-4 md:mb-0 md:mr-6 shrink-0">
             <Image
-              src={profile.creator.file_path}
+              src={profile.creator.file_name}
               alt="プロフィール写真"
               fill
               sizes="(max-width: 360px) 100vw"
@@ -140,7 +167,6 @@ export default function ProfilePage() {
                   </button>
                 </div>
               </div>
-              {/* ここまでできている */}
 
               {/* 右側: 会社名、ポートフォリオ、インスタグラム */}
               <div className="flex flex-col gap-1 text-sm text-gray-700">
@@ -289,7 +315,7 @@ export default function ProfilePage() {
                   >
                     <div className="relative w-[200px] h-[200px] mx-auto mb-1">
                       <Image
-                        src={staff.file_path}
+                        src={staff.file_name}
                         alt={staff.name}
                         fill
                         sizes="(max-width: 100%)"

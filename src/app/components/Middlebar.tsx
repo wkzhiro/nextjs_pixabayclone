@@ -20,8 +20,15 @@ function getUniqueCosts(data: any[]): number[] {
   return Array.from(new Set(allCosts)).sort((a, b) => a - b)
 }
 
+interface MiddlebarProps {
+  onTagsChange: (tags: {
+    jobs: string[]
+    media: string[]
+    costs: number[]
+  }) => void
+}
 
-export default function Middlebar({ onSearch }) {
+export default function Middlebar({ onTagsChange }: MiddlebarProps) {
   const { data: session } = useSession()
 
   const jobList = getUniqueJobs(dummyData)
@@ -111,6 +118,14 @@ export default function Middlebar({ onSearch }) {
       ? `${base} bg-gray-200 text-gray-800`
       : `${base} text-gray-600 hover:text-gray-800`
   }
+
+  useEffect(() => {
+    onTagsChange({
+      jobs: selectedJobs,
+      media: selectedMedia,
+      costs: selectedCosts,
+    })
+  }, [selectedJobs, selectedMedia, selectedCosts])
 
   return (
     <div className="relative w-full">
