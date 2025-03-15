@@ -41,7 +41,7 @@ export default function Home() {
   const handleSearch = async () => {
     setLoading(true); // fetch開始前にloadingをtrue
     try {
-      const endpointURL = `http://127.0.0.1:8000/api/v1/creators/first`;
+      const endpointURL = `${process.env.NEXT_PUBLIC_AZURE_BACK_ENDPOINT}/api/v1/creators/first`;
       const res = await fetch(endpointURL);
       const data = await res.json();
       console.log("data", data);

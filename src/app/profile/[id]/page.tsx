@@ -34,7 +34,7 @@ export default function ProfilePage() {
     if (!id) return;
     const fetchProfile = async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/v1/creator/${id}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_AZURE_BACK_ENDPOINT}/api/v1/creator/${id}`);
         if (!res.ok) {
           throw new Error("Failed to fetch profile data");
         }
@@ -85,9 +85,8 @@ export default function ProfilePage() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center p-4">
           {/* 左側: プロフィール写真 */}
           <div className="relative w-[360px] h-[360px] mb-4 md:mb-0 md:mr-6 shrink-0">
-            {/* {profile.creator.file_name}を一旦仮 */}
             <Image
-              src="https://randomuser.me/api/portraits/men/1.jpg"
+              src={profile.creator.file_path}
               alt="プロフィール写真"
               fill
               sizes="(max-width: 360px) 100vw"
@@ -246,9 +245,8 @@ export default function ProfilePage() {
                 profile.relatedworks.map((work:any, i:number) => (
                   <div key={i} className="rounded overflow-hidden">
                     <div className="relative w-[360px] h-[206px] mx-auto">
-                    {/* srcは本来はこれ{work.product_image_path} */}
                       <Image
-                        src="https://picsum.photos/300/180?random=1"
+                        src={work.product_image_path}
                         alt={`work-${i}`}
                         fill
                         sizes="(max-width: 100%)"
@@ -291,7 +289,7 @@ export default function ProfilePage() {
                   >
                     <div className="relative w-[200px] h-[200px] mx-auto mb-1">
                       <Image
-                        src="https://randomuser.me/api/portraits/men/1.jpg"
+                        src={staff.file_path}
                         alt={staff.name}
                         fill
                         sizes="(max-width: 100%)"

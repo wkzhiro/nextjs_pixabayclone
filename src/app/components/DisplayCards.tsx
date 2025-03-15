@@ -44,7 +44,7 @@ export default function DisplayCards({ images }) {
         </p>
         <div className="grid grid-cols-3 gap-4">
           {/* imageは本来file_nameだが一旦仮置き,work={data.product_image_path}も */}
-          {currentItems.map((data, index) => (
+          {currentItems.map((data:any, index:any) => (
             <BusinessCard
               key={index}
               uuid={data.creator_id}
