@@ -4,8 +4,19 @@ import Link from "next/link";
 import { Tag } from "./Tag";
 import { BusinessCardProps } from "@/types/businesscard";
 
+function isValidUrl(value:string) {
+  try {
+    new URL(value);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
 export const BusinessCard: React.FC<BusinessCardProps> = ({
   uuid,         // 追加：ビジネスカードの識別子
+  name,
+  furigana,
   image,        // プロフィール画像のURL
   personInfo,   // { name, englishname, department, phone, email }
   tags,         // 例: ["ディレクター"]
@@ -13,6 +24,8 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
   fileType,     // 例: "動画"
   title,        // 作品タイトル（説明文）
   work,
+  inquiry_email,
+  inquiry_phone,
   company          // 作品画像のURL
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,6 +44,57 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
     };
   }, [isModalOpen]);
 
+
+  const [imageUrl, setImageUrl] = useState<string | null>();
+  const [productUrl, setProductUrl] = useState<string | null>();
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!image) return; // image が空の場合は何もしない
+    // image がすでに有効な URL なら、そのままセット
+    if (isValidUrl(image)) {
+      setImageUrl(image);
+      return;
+    }
+    // image が URL 形式でなければ、API 経由で取得する
+    const fetchBlobUrl = async () => {
+      try {
+        const res = await fetch(`/api/get_staff_imaga_by_azure_storage?fileName=${encodeURIComponent(image)}`);
+        if (!res.ok) {
+          throw new Error("Failed to fetch blob URL");
+        }
+        const data = await res.json();
+        setImageUrl(data.url);
+      } catch (err: any) {
+        setError(err.message);
+      }
+    };
+    fetchBlobUrl();
+  });
+
+  useEffect(() => {
+    if (!work) return;
+    // image がすでに有効な URL なら、そのままセット
+    if (isValidUrl(work)) {
+      setProductUrl(work);
+      return;
+    }
+    // image が URL 形式でなければ、API 経由で取得する
+    const fetchBlobUrl = async () => {
+      try {
+        const res = await fetch(`/api/get_product_image_by_azure_storage?fileName=${encodeURIComponent(work)}`);
+        if (!res.ok) {
+          throw new Error("Failed to fetch blob URL");
+        }
+        const data = await res.json();
+        setProductUrl(data.url);
+      } catch (err: any) {
+        setError(err.message);
+      }
+    };
+    fetchBlobUrl();
+  });
+
   return (
     <div className="w-full max-w-md bg-white border border-gray-300 rounded-md shadow-sm overflow-hidden">
       {/* 黒いバーを最上部に配置 */}
@@ -41,10 +105,9 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
         <div className="md:w-1/2 flex flex-col items-center md:items-start">
           <Link href={`/profile/${uuid}`}>
             <div className="relative w-24 h-24 rounded-full overflow-hidden mb-2 cursor-pointer">
-              {/* 本来はsrcにimageを入れる */}
               <Image
-                src={image}
-                alt={personInfo.name}
+                src={imageUrl}
+                alt={name}
                 fill
                 sizes="100vw"
                 className="object-cover"
@@ -64,8 +127,8 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
         {/* 右側：名前 + 連絡先 */}
         <div className="mt-4 md:mt-0 md:w-1/2 md:ml-4 flex flex-col items-center md:items-start">
           {/* 名前・英名 */}
-          <h2 className="text-xl font-bold text-gray-800">{personInfo.name}</h2>
-          <p className="text-sm text-gray-500 mb-4">{personInfo.name_furigana}</p>
+          <h2 className="text-xl font-bold text-gray-800">{name}</h2>
+          <p className="text-sm text-gray-500 mb-4">{furigana}</p>
 
           {/* 連絡先 */}
           <div className="flex items-center text-gray-700 mb-2">
@@ -74,11 +137,11 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
           </div>
           <div className="flex items-center text-gray-700 mb-2">
             <span className="inline-block w-5 mr-2">📞</span>
-            <span className="text-[10px]">{personInfo.mobile_phone}</span>
+            <span className="text-[10px]">{inquiry_phone}</span>
           </div>
           <div className="flex items-center text-gray-700">
             <span className="inline-block w-5 mr-2">✉️</span>
-            <span className="text-[8px]">{personInfo.personal_email}</span>
+            <span className="text-[8px]">{inquiry_email}</span>
           </div>
         </div>
       </div>
@@ -95,7 +158,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
         >
           {/* 本来はsrcにworkを入れる */}
           <Image
-            src={work}
+            src={productUrl}
             alt="作品画像"
             width={600}
             height={350}

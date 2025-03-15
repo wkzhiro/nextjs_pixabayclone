@@ -12,6 +12,14 @@ import Middlebar from './components/Middlebar';
 import { FaSearch } from 'react-icons/fa';
 import Footer from './components/Footer';
 
+const test_query = {
+  "oid": "sample-org-002",
+  "keyword": "",
+  "occupations": ["プロデューサー"],
+  "avg_min": null,
+  "avg_max": null
+}
+
 // メインのHomeコンポーネント
 export default function Home() {
   const { data: session } = useSession({
@@ -55,6 +63,56 @@ export default function Home() {
   };
 
 
+  const querySearch = async (keyword: string, tags: { jobs: string[], media: string[], costs: number[] }) => {
+    try {
+      const endpointURL = "api/get_information_by_query"; // エンドポイント指定
+      const bodyData = {
+        oid: "dummy_oid", // 固定値または環境変数などで設定
+        keyword: keyword || "", // キーワードが空の場合は空文字を
+        occupations: tags.jobs && tags.jobs.length > 0 ? tags.jobs : [],
+        avg_min:
+          tags.costs && tags.costs.length > 0
+            ? Math.min(...tags.costs)
+            : null,
+        avg_max:
+          tags.costs && tags.costs.length > 0
+            ? Math.max(...tags.costs)
+            : null,
+      };
+
+      const res = await fetch(endpointURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(bodyData) // キーワードのみを送信
+      });
+      const data = await res.json();
+      // mapを使って配列を変換（例：creator_name を name に変換など）
+      const newArray = data.results.map((item: any, index: number) => {
+        return {
+          creator_id: item.creator_id,
+          creator_name: item.creator_name,
+          file_name: item.file_name,
+          latest_product_number: item.latest_product_number,
+          latest_product_title: item.latest_product_title,
+          latest_product_image_path: item.latest_product_image_path,
+          latest_inquiry_email: item.latest_inquiry_email,
+          latest_inquiry_phone: item.latest_inquiry_phone,
+          occupations: item.occupations,
+          company_name: item.company_name
+        };
+      });
+      console.log("Transformed array:", newArray);
+
+      // 必要に応じて displayData を更新するなどの処理
+      setDisplayData(newArray);
+    } catch (error) {
+      console.error("Query search error:", error);
+    }
+  };
+
+
   useEffect(() => {
     if (initialFetchData.length > 0 && displayData.length === 0) {
       setDisplayData(initialFetchData);
@@ -79,7 +137,7 @@ export default function Home() {
       <>
         <Navbar />
         <div className="mt-[247px] mb-[161px]">
-          <Search onSearch={handleSearch} count={count} />
+          <Search onSearch={querySearch}/>
         </div>
         <div className="pb-[300px] bg-[#F2F6F9]">
           Loading...
@@ -94,7 +152,7 @@ export default function Home() {
     <>
       <Navbar />
       <div className="mt-[247px] mb-[161px]">
-        <Search onSearch={handleSearch} count={count} />
+        <Search onSearch={querySearch}/>
       </div>
       <DisplayCards images={displayData} />
       <Footer />
