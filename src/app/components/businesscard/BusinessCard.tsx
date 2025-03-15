@@ -46,6 +46,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
                 src={image}
                 alt={personInfo.name}
                 fill
+                sizes="100vw"
                 className="object-cover"
               />
             </div>
@@ -94,7 +95,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
         >
           {/* 本来はsrcにworkを入れる */}
           <Image
-            src="https://picsum.photos/300/180?random=1"
+            src={work}
             alt="作品画像"
             width={600}
             height={350}
