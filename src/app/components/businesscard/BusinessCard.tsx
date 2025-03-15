@@ -30,8 +30,8 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   // モーダル処理は必要な場合のみ利用
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  // const openModal = () => setIsModalOpen(true);
+  // const closeModal = () => setIsModalOpen(false);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -153,8 +153,8 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
       <div className="px-4 py-4 flex flex-col items-start">
         {/* 作品画像 */}
         <div
-          className="w-full h-auto mb-3 cursor-pointer"
-          onClick={openModal}
+          className="w-full h-auto mb-3 cursor-default"
+          // onClick={openModal}
         >
           {/* 本来はsrcにworkを入れる */}
           <Image
@@ -175,14 +175,14 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
       </div>
 
       {/* モーダルウィンドウ（必要な場合） */}
-      {isModalOpen && (
+      {/* {isModalOpen && (
         <div
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
           onClick={closeModal}
         >
           <div
             className="relative bg-white rounded-lg w-11/12 max-w-4xl overflow-y-auto max-h-[90%]"
-            onClick={(e) => e.stopPropagation()}
+            // onClick={(e) => e.stopPropagation()}
           >
             <iframe
               src="https://tech0-jp.com/"
@@ -191,7 +191,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
             />
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
