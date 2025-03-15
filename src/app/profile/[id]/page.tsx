@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { dummyData } from "@/data/dummyData";
 import {
   FaPhone,
@@ -308,12 +309,13 @@ export default function ProfilePage() {
             <h2 className="text-2xl font-bold mb-8">Related Staff</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {profile.relatedstaff &&
-                profile.relatedstaff.map((staff:any, i:number) => (
+                profile.relatedstaff.slice(0, 5).map((staff:any, i:number) => (
                   <div
                     key={i}
                     className="flex flex-col items-center justify-center"
                   >
                     <div className="relative w-[200px] h-[200px] mx-auto mb-1">
+                    <Link href={`/profile/${staff.creator_id}`}>
                       <Image
                         src={staff.file_name}
                         alt={staff.name}
@@ -321,6 +323,7 @@ export default function ProfilePage() {
                         sizes="(max-width: 100%)"
                         className="object-cover"
                       />
+                    </Link>
                     </div>
                     <div className="bg-black text-sm text-white rounded px-3 py-1 my-3 w-[104px] h-[26px] flex items-center justify-center">
                       {staff.occupations.map((occ: any) => occ.occupation_name ?? "N/A")}
