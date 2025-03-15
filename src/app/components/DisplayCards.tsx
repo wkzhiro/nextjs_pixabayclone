@@ -48,7 +48,7 @@ export default function DisplayCards({ images }) {
           {currentItems.map((data:any, index:any) => (
             <BusinessCard
               key={index}
-               name={data.name}
+               name={data.name || data.creator_name}
               furigana={data.name_furigana}
                uuid={data.creator_id}
                image={data.file_name}

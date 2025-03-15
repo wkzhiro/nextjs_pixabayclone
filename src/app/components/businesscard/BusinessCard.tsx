@@ -104,7 +104,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
         {/* 左側：顔写真＆タグ */}
         <div className="md:w-1/2 flex flex-col items-center md:items-start">
           <Link href={`/profile/${uuid}`}>
-            <div className="relative w-24 h-24 rounded-full overflow-hidden mb-2 cursor-pointer">
+            <div className="relative w-[120px] h-[120px] rounded-full overflow-hidden mb-2 cursor-pointer">
               <Image
                 src={imageUrl}
                 alt={name}
