@@ -1,27 +1,31 @@
-import { useRef } from 'react'; // reactからuseRefをインポート
+import { useState, useRef } from 'react'; // reactからuseRefをインポート
 import { FaSearch } from 'react-icons/fa'; // react-iconsからFaSearchをインポート
 import Middlebar from './Middlebar';
 
-export default function Search({ onSearch, count}) { // Search関数をエクスポート
+interface SearchProps {
+  onSearch: (keyword: string, tags: { jobs: string[], media: string[], costs: number[] }) => void;
+}
+
+export default function Search({ onSearch}: SearchProps) { // Search関数をエクスポート
   const inputRef = useRef<HTMLInputElement>(null); // useRefを使用してinputRefを定義
 
-  const handleSubmit = (event) => { // handleSubmit関数を定義
-    event.preventDefault(); // デフォルトのイベントを防止
-    onSearch(inputRef.current.value); // onSearch関数を呼び出し、inputRefの現在の値を渡す
+  const [middlebarTags, setMiddlebarTags] = useState<{
+    jobs: string[]
+    media: string[]
+    costs: number[]
+  }>({ jobs: [], media: [], costs: [] })
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const keyword = inputRef.current?.value || "";
+    // Middlebar のタグ情報と合わせて上位 onSearch に渡す
+    onSearch(keyword, middlebarTags);
   };
-  const handleSearch = async (keyword) => {
-    // Pixabay APIのエンドポイントURL
-    const endpointURL = `https://pixabay.com/api/?key=${process.env.NEXT_PUBLIC_PIXABAY_API_KEY}&q=${keyword}&image_type=photo`;
-    const res = await fetch(endpointURL);
-    // レスポンスをJSONにパース
-    const data = await res.json();
-    // 必要なデータを抽出
-    const fetchData_raw = data.hits;
+
+  const handleTagsChange = (tags: { jobs: string[], media: string[], costs: number[] }) => {
+    setMiddlebarTags(tags);
   };
 
-
-
-  console.log(count)
   return (
     <div className="container mx-auto flex flex-col items-center">
       {/* 中央揃えのためのラッパー要素 */}
@@ -43,7 +47,7 @@ export default function Search({ onSearch, count}) { // Search関数をエクス
       </div>
       {/* 2. Middlebarを配置する部分 */}
       <div className="w-full md:w-3/4 lg:w-3/4 px-4 mt-[45px]">
-        <Middlebar onSearch={handleSearch} />
+        <Middlebar onTagsChange={handleTagsChange} />
       </div>
     </div>
   );
